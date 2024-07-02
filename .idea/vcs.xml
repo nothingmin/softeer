@@ -8,5 +8,6 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/missions/W1/sql/csv/sample_mysql_database" vcs="Git" />
   </component>
 </project>

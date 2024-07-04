@@ -118,6 +118,7 @@ def transform(imf_gdp):
                 region.append(country_region[country])
             else:
                 region.append(None)
+                logging.debug("region for {} not found".format(country))
         return pd.DataFrame(region, columns=['Region'])
 
     region_column = get_region_column(imf_gdp)

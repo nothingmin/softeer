@@ -1,0 +1,4 @@
+missions/W1/sql/my.db
+missions/W1/ETL/World_Economies.db
+missions/W1/ETL/etl_project_log.txt
+missions/W1/ETL/Countries_by_GDP.json

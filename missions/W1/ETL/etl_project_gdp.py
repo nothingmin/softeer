@@ -71,34 +71,47 @@ country_region = {'Afghanistan': 'Asia', 'Armenia': 'Europe', 'Azerbaijan': 'Eur
 
 def extract():
     logging.debug("extracting GDP from wikipedia")
+    # get wikipedia page
     html = requests.get('https://en.wikipedia.org/wiki/List_of_countries_by_GDP_%28nominal%29').text
     soup = BeautifulSoup(html, 'html.parser')
+    # find gdp table tag from page
     gdp_table = soup.find("table", attrs={"class": "wikitable sortable sticky-header-multi static-row-numbers"})
+    # make table using table tag
     parsed = parser.make2d(gdp_table)
-
-    def remove_nested_parens(input_str):
-        result = ''
-        paren_level = 0
-        for ch in input_str:
-            if ch == '[':
-                paren_level += 1
-            elif (ch == ']') and paren_level:
-                paren_level -= 1
-            elif not paren_level:
-                result += ch
-        return result
-
-    for i, row in enumerate(parsed):
-        for j, word in enumerate(row):
-            parsed[i][j] = remove_nested_parens(word).replace(',', '')
-    gdp_frame = pd.DataFrame(parsed[2:], columns=[parsed[0], parsed[1]])
+    # filter table
+    filtered_table = filter_table(parsed)
+    # make dataframe from table
+    gdp_frame = pd.DataFrame(filtered_table[2:], columns=[filtered_table[0], filtered_table[1]])
+    # export imf table
     imf_gdp = gdp_frame[['Country/Territory', 'IMF']]
     logging.debug("extracted GDP from wikipedia done")
     return imf_gdp
 
 
+def filter_table(parsed):
+    filtered = []
+    for i, row in enumerate(parsed):
+        for j, word in enumerate(row):
+            filtered[i][j] = remove_nested_parens(word).replace(',', '')
+    return filtered
+
+
+def remove_nested_parens(input_str):
+    result = ''
+    paren_level = 0
+    for ch in input_str:
+        if ch == '[':
+            paren_level += 1
+        elif (ch == ']') and paren_level:
+            paren_level -= 1
+        elif not paren_level:
+            result += ch
+    return result
+
+
 def transform(imf_gdp):
     logging.debug("transforming step start")
+    # drop unnecessary multi-column
     imf_gdp.columns = imf_gdp.columns.droplevel()
     imf_gdp = imf_gdp.rename(columns={'Country/Territory': 'Country', 'Forecast': 'GDP_USD_billion'})
     imf_gdp = (
@@ -112,22 +125,23 @@ def transform(imf_gdp):
     imf_gdp['GDP_USD_billion'] = imf_gdp['GDP_USD_billion'] / 1000
     imf_gdp = imf_gdp.round({'GDP_USD_billion': 2})
 
-    def get_region_column(imf_gdp):
-        region = []
-        for row in imf_gdp.iterrows():
-            country = row[1]['Country']
-            if country in country_region:
-                region.append(country_region[country])
-            else:
-                region.append(None)
-                logging.debug("region for {} not found".format(country))
-        return pd.DataFrame(region, columns=['Region'])
-
     region_column = get_region_column(imf_gdp)
     imf_gdp_with_region = pd.merge(imf_gdp, region_column,
                                    how='right', right_index=True, left_index=True)
     logging.debug("transforming step done")
     return imf_gdp_with_region
+
+
+def get_region_column(imf_gdp):
+    region = []
+    for row in imf_gdp.iterrows():
+        country = row[1]['Country']
+        if country in country_region:
+            region.append(country_region[country])
+        else:
+            region.append(None)
+            logging.debug("region for {} not found".format(country))
+    return pd.DataFrame(region, columns=['Region'])
 
 
 def load(imf_gdp_with_region):

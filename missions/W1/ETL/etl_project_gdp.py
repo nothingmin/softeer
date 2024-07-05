@@ -6,6 +6,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from html_table_parser import parser_functions as parser
+from pandasql import sqldf
 
 collections.Callable = collections.abc.Callable
 logger = logging.getLogger(__name__)
@@ -96,18 +97,24 @@ def load(imf_gdp_with_region):
 
 
 def get_countries_gdp_more_than_100b(db_name='Countries_by_GDP.json'):
-    query = 'GDP_USD_billion>=100'
-    logging.debug("executing query {}".format(query))
     gdp = pd.read_json(db_name)
-    for row in gdp.query(query).iterrows():
-        print(row[1])
+    return sqldf("SELECT * FROM gdp WHERE GDP_USD_billion >= 100")
 
 
 def get_average_gdp_for_region(db_name='Countries_by_GDP.json'):
     gdp = pd.read_json(db_name)
-    gdp_group_by_region = gdp.query("Region != None").groupby(by="Region")['GDP_USD_billion'].nlargest(5).groupby(
-        by='Region').mean('GDP_USD_billion').round(2)
-    return gdp_group_by_region
+    return sqldf("""
+        SELECT Region, ROUND(AVG(GDP_USD_billion),2) FROM
+        (
+            SELECT
+                Region,
+                GDP_USD_billion,
+                RANK() OVER (PARTITION BY Region ORDER BY GDP_USD_billion DESC) AS RANKING
+            FROM gdp
+        )
+        WHERE RANKING <= 5 AND Region IS NOT NULL
+        GROUP BY Region
+        """)
 
 
 if __name__ == '__main__':

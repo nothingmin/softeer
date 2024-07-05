@@ -89,11 +89,10 @@ def extract():
 
 
 def filter_table(parsed):
-    filtered = []
     for i, row in enumerate(parsed):
         for j, word in enumerate(row):
-            filtered[i][j] = remove_nested_parens(word).replace(',', '')
-    return filtered
+            parsed[i][j] = remove_nested_parens(word).replace(',', '')
+    return parsed
 
 
 def remove_nested_parens(input_str):

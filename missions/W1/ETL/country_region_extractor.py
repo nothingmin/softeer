@@ -37,7 +37,9 @@ def get_table(url):
 
 
 if __name__ == '__main__':
-    country_region = {}
+    country_region = {
+        "Hong Kong": "Asia"
+    }
     for url, region in target_url:
         df = get_table(url)
         for row in df.filter(regex='(Country)|(Location)').iterrows():

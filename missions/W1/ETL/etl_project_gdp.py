@@ -4,6 +4,8 @@ import logging
 
 import pandas as pd
 import requests
+import yaml
+from box import Box
 from bs4 import BeautifulSoup
 from html_table_parser import parser_functions as parser
 from pandasql import sqldf
@@ -13,11 +15,16 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(filename='etl_project_log.txt', encoding='utf-8', level=logging.DEBUG,
                     format='%(asctime)s,%(message)s', datefmt='%Y-%B-%d-%H-%M-%S')
 
+with open('config.yaml', 'r') as f:
+    config_yaml = yaml.load(f, Loader=yaml.FullLoader)
+    print(config_yaml)
+    config = Box(config_yaml)
+
 
 def extract():
     logging.debug("extracting GDP from wikipedia")
     # get wikipedia page
-    html = requests.get('https://en.wikipedia.org/wiki/List_of_countries_by_GDP_%28nominal%29').text
+    html = requests.get(config.GDP_WIKIPEDIA_URL).text
     soup = BeautifulSoup(html, 'html.parser')
     # find gdp table tag from page
     gdp_table = soup.find("table", attrs={"class": "wikitable sortable sticky-header-multi static-row-numbers"})
@@ -92,16 +99,16 @@ def get_region_column(imf_gdp):
 
 def load(imf_gdp_with_region):
     logging.debug("loading GDP in json start")
-    imf_gdp_with_region.to_json('Countries_by_GDP.json')
+    imf_gdp_with_region.to_json(config.LOAD_FILE_DESTINATION)
     logging.debug("loading GDP in json done")
 
 
-def get_countries_gdp_more_than_100b(db_name='Countries_by_GDP.json'):
+def get_countries_gdp_more_than_100b(db_name=config.LOAD_FILE_DESTINATION):
     gdp = pd.read_json(db_name)
     return sqldf("SELECT * FROM gdp WHERE GDP_USD_billion >= 100")
 
 
-def get_average_gdp_for_region(db_name='Countries_by_GDP.json'):
+def get_average_gdp_for_region(db_name=config.LOAD_FILE_DESTINATION):
     gdp = pd.read_json(db_name)
     return sqldf("""
         SELECT Region, ROUND(AVG(GDP_USD_billion),2) FROM

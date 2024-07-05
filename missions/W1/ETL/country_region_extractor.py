@@ -3,31 +3,30 @@ import json
 
 import pandas as pd
 import requests
+import yaml
+from box import Box
 from bs4 import BeautifulSoup
 from html_table_parser import parser_functions as parser
 
 collections.Callable = collections.abc.Callable
+with open('config.yaml', 'r') as f:
+    config_yaml = yaml.load(f, Loader=yaml.FullLoader)
+    print(config_yaml)
+    config = Box(config_yaml)
 
 target_url = [(
-    "https://en.wikipedia.org/wiki/List_of_African_countries_by_GDP_(nominal)",
-    "Africa"
+    config.AFRICA_COUNTRY_URL, "Africa"
 ), (
-    "https://en.wikipedia.org/wiki/List_of_South_American_countries_and_dependencies_by_GDP_(PPP)",
-    "South America"
+    config.SOUTH_AMERICA_COUNTRY_URL, "South America"
 ), (
-    "https://en.wikipedia.org/wiki/List_of_North_American_countries_by_GDP_(nominal)",
-    "North America"
+    config.NORTH_AMERICA_COUNTRY_URL, "North America"
 ), (
-    "https://en.wikipedia.org/wiki/List_of_Asian_countries_by_GDP",
-    "Asia"
+    config.ASIA_COUNTRY_URL, "Asia"
 ), (
-    "https://en.wikipedia.org/wiki/List_of_sovereign_states_in_Europe_by_GDP_(nominal)",
-    "Europe"
+    config.EUROPE_COUNTRY_URL, "Europe"
 ), (
-    "https://en.wikipedia.org/wiki/List_of_Oceanian_countries_by_GDP",
-    "Oceania"
-),
-]
+    config.OCEANIA_COUNTRY_URL, "Oceania"
+)]
 
 
 def get_table(url):

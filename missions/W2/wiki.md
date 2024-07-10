@@ -26,6 +26,13 @@ Wordcloud 동작 방식
 전체 코드 : https://github.com/nothingmin/softeer/tree/main/missions/W2/wordcloud.ipynb
 원문 출처 : https://peekaboo-vision.blogspot.com/2012/11/a-wordcloud-in-python.html
 
+## Sentiment Analysis 추가 학습
+
+추가 학습거리에서 주어진 논문은 트위터로부터 선거 결과를 예측하는 머신 러닝 알고리즘을 소개하고 있다. 예측의 정확도는 90%가 넘고 기존 방식(출구조사)보다
+높은 정확도를 보인다고 주장한다. 논문 요약을 읽고나서 어떻게 트위터의 데이터(트윗)가 전체 여론을 대변할 수 있었는지가 궁금했다.
+그 이유는 여론 조사를 할 때 트위터와 같은 온라인 매체는 젊은 사람들의 여론만 반영하기 때문에 전화 조사와 같은 전통적인 매체도 섞어서 사용하는 것이
+우리나라에서는 일반적이기 떄문이다.
+
 ## Docker
 
 Docker를 사용하는 이유가 뭘까요?

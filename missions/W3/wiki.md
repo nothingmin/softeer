@@ -1,0 +1,7 @@
+## 도커로 로컬 하둡 클러스터 구성하기
+https://velog.io/@wnl1012/%EB%8F%84%EC%BB%A4%EB%A1%9C-%EB%A1%9C%EC%BB%AC-%ED%95%98%EB%91%A1-%ED%81%B4%EB%9F%AC%EC%8A%A4%ED%84%B0-%EA%B5%AC%EC%84%B1%ED%95%98%EA%B8%B0-1-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EB%B9%8C
+
+
+
+
+
